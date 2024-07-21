@@ -351,7 +351,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1243357420}
-  - component: {fileID: 1243357419}
+  - component: {fileID: 1243357421}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -359,24 +359,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1243357419
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1243357418}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 050361fae5640d2459f26259853aee5d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnChatMessage:
-    m_PersistentCalls:
-      m_Calls: []
-  username: Koritster
-  password: oauth:0zu1hc6pxtn0q1mp2i2iz7n8vw0u5w
-  channelName: Koritster
 --- !u!4 &1243357420
 Transform:
   m_ObjectHideFlags: 0
@@ -392,6 +374,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1243357421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1243357418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5af0de1464ef994bb6129927717955f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnChatMessage:
+    m_PersistentCalls:
+      m_Calls: []
+  User: UriLZX_
+  OAuth: oauth:3mfmnzfmufsar6gydk1aibyu21voua
+  Channel: UriLZX_
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
