@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using System.IO;
 using System.Net.Sockets;
+using System.IO;
+using System;
 
 public class TwitchChat : MonoBehaviour
 {
@@ -19,17 +20,18 @@ public class TwitchChat : MonoBehaviour
     private float reconnectTimer;
     private float reconnectAfter;
 
-    private void Connect()
+    private void ConnectToTwitch()
     {
-        tcpClient = new TcpClient("irc.chat.twitch.tv", 6667); 
-        sr = new StreamReader(tcpClient.GetStream()); 
+        tcpClient = new TcpClient("irc.chat.twitch.tv", 6667);
+        sr = new StreamReader(tcpClient.GetStream());
         sw = new StreamWriter(tcpClient.GetStream());
-        sw.WriteLine("PASS " + password); 
+        sw.WriteLine("PASS " + password);
         sw.WriteLine("NICK " + username);
         sw.WriteLine("USER " + username + " 8 *:" + username);
         sw.WriteLine("JOIN #" + channelName);
         sw.Flush();
     }
+
 
     public void ReadChat()
     {
@@ -52,8 +54,8 @@ public class TwitchChat : MonoBehaviour
 
     private void Start()
     {
-        reconnectAfter = 60f;
-        Connect();
+        reconnectAfter = 10f;
+        ConnectToTwitch();
     }
 
     private void Update()
@@ -65,7 +67,7 @@ public class TwitchChat : MonoBehaviour
 
         if(tcpClient.Available == 0 && reconnectTimer >= reconnectAfter)
         {
-            Connect();
+            ConnectToTwitch();
             reconnectTimer = 0.0f;
         }
 
