@@ -35,6 +35,10 @@ public class TwitchConnect : MonoBehaviour
 
     private void Awake()
     {
+        User = PlayerPrefs.GetString("Username");
+        Channel = PlayerPrefs.GetString("ChannelName");
+        OAuth = PlayerPrefs.GetString("Oauth");
+
         ConnectToTwitch();
     }
     void Update()
