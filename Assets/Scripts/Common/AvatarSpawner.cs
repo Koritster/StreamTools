@@ -10,10 +10,10 @@ public class AvatarSpawner : MonoBehaviour
         //Establece las localizaciones automáticamente. Las localizaciones deben tener el tag SpawnAvatarLocation
         GameObject[] locations = GameObject.FindGameObjectsWithTag("SpawnAvatarLocation");
 
-        spawnLocations = new Transform[locations.Length];
+        spawnLimits = new Transform[locations.Length];
         for (int i = 0; i < locations.Length; i++)
         {
-            spawnLocations[i] = locations[i].transform;
+            spawnLimits[i] = locations[i].transform;
         }
     }
 
@@ -23,7 +23,7 @@ public class AvatarSpawner : MonoBehaviour
 
 
     //Localizaciones donde un avatar puede aparecer al escribir un mensaje
-    private Transform[] spawnLocations;
+    private Transform[] spawnLimits;
     //Diccionario que almacena el nombre de usuario como llave y su script de Avatar para acceder a él desde cualquier script
     [HideInInspector] public Dictionary<string, Avatar> usersWithAvatar = new Dictionary<string, Avatar>();
 
@@ -47,7 +47,7 @@ public class AvatarSpawner : MonoBehaviour
         //Instancia un nuevo avatar si aún no había uno para la persona que habló. Lo guarda en el diccionario
         if (!usersWithAvatar.ContainsKey(user))
         {
-            GameObject avatarGO = Instantiate(pf_Avatar, spawnLocations[Random.Range(0, spawnLocations.Length)]);
+            GameObject avatarGO = Instantiate(pf_Avatar, new Vector3(Random.Range(spawnLimits[0].position.x, spawnLimits[1].position.x), 0f, 0f), Quaternion.identity);
 
             Avatar avatar = avatarGO.GetComponent<Avatar>();
             avatar.ChangeName(user);
