@@ -66,7 +66,7 @@ public class AvatarSpawner : MonoBehaviour
             //ciclo para validar que el cambio sea adecuado para la categoría que se seleccione
             while (true)
             {
-                GameObject avatarGO = Instantiate(pf_Avatar, spawnLocations[Random.Range(0, spawnLocations.Length)]);
+                GameObject avatarGO = Instantiate(pf_Avatar, spawnLimits[Random.Range(0, spawnLimits.Length)]);
 
                 Avatar avatar = avatarGO.GetComponent<Avatar>();
                 avatar.ChangeName(user);
