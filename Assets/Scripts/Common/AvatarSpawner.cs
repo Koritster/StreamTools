@@ -7,13 +7,13 @@ public class AvatarSpawner : MonoBehaviour
 {
     private void Awake()
     {
-        //Establece las localizaciones automáticamente. Las localizaciones deben tener el tag SpawnAvatarLocation
+        //Establece las localizaciones automÃ¡ticamente. Las localizaciones deben tener el tag SpawnAvatarLocation
         GameObject[] locations = GameObject.FindGameObjectsWithTag("SpawnAvatarLocation");
 
-        spawnLocations = new Transform[locations.Length];
+        spawnLimits = new Transform[locations.Length];
         for (int i = 0; i < locations.Length; i++)
         {
-            spawnLocations[i] = locations[i].transform;
+            spawnLimits[i] = locations[i].transform;
         }
     }
 
@@ -28,15 +28,15 @@ public class AvatarSpawner : MonoBehaviour
     [SerializeField] private GameObject pf_Avatar;
 
     //Localizaciones donde un avatar puede aparecer al escribir un mensaje
-    private Transform[] spawnLocations;
-    //Diccionario que almacena el nombre de usuario como llave y su script de Avatar para acceder a él desde cualquier script
+    private Transform[] spawnLimits;
+    //Diccionario que almacena el nombre de usuario como llave y su script de Avatar para acceder a Ã©l desde cualquier script
     [HideInInspector] public Dictionary<string, Avatar> usersWithAvatar = new Dictionary<string, Avatar>();
 
     public void OnChatMessage(string user, string message)
     {
         bool canSpawn = false;
 
-        //Verifica que el usuario no esté baneado
+        //Verifica que el usuario no estÃ© baneado
         foreach (string list in bannedUsers)
         {
             if (user.Contains(list.ToLower()))
@@ -60,10 +60,10 @@ public class AvatarSpawner : MonoBehaviour
             return;
         }
 
-        //Instancia un nuevo avatar si aún no había uno para la persona que habló. Lo guarda en el diccionario
+        //Instancia un nuevo avatar si aÃºn no habÃ­a uno para la persona que hablÃ³. Lo guarda en el diccionario
         if (!usersWithAvatar.ContainsKey(user))
         {
-            //ciclo para validar que el cambio sea adecuado para la categoría que se seleccione
+            //ciclo para validar que el cambio sea adecuado para la categorÃ­a que se seleccione
             while (true)
             {
                 GameObject avatarGO = Instantiate(pf_Avatar, spawnLocations[Random.Range(0, spawnLocations.Length)]);

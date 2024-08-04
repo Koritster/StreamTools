@@ -8,6 +8,7 @@ public class Avatar : MonoBehaviour
 {
     private void Start()
     {
+        Physics2D.IgnoreLayerCollision(10, 10);
         timerAvatar = 0f;
     }
 

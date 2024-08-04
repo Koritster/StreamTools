@@ -353,8 +353,7 @@ GameObject:
   - component: {fileID: 3944841769613568529}
   - component: {fileID: 8413750975616004887}
   - component: {fileID: 2036380114917058776}
-  - component: {fileID: 6703354459691103630}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Avatar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -518,7 +517,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 0
   m_CollisionDetection: 1
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!95 &2036380114917058776
 Animator:
   serializedVersion: 5
