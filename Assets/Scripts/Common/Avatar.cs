@@ -12,6 +12,11 @@ public class Avatar : MonoBehaviour
         timerAvatar = 0f;
     }
 
+    public void ChangeAvatar(AvatarCharacter avatar)
+    {
+        GetComponent<Animator>().runtimeAnimatorController = avatar.avatar;
+    }
+    
     #region UI
 
     //UI variables
@@ -87,7 +92,7 @@ public class Avatar : MonoBehaviour
 
     private float timerAvatar = 0f;
 
-    private void DissapearAvatar()
+    public void DissapearAvatar()
     {
         gameObject.SetActive(false);
     }
