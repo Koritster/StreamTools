@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 220830626}
   - component: {fileID: 220830625}
   - component: {fileID: 220830627}
+  - component: {fileID: 220830628}
   m_Layer: 0
   m_Name: Scripter
   m_TagString: Untagged
@@ -153,8 +154,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a135a9007ac0ad94c848da888b715d4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  avatarCategory: Mario
+  avatarCharacters:
+  - {fileID: 11400000, guid: d17619cc14e3bb54a9d62457fc946cf7, type: 2}
+  - {fileID: 11400000, guid: 35a5eb3ac1c0cfb498a7301c17924106, type: 2}
   bannedUsers:
   - StreamElements
+  commandsWhiteList:
+  - '!avatar'
   pf_Avatar: {fileID: 8635274958248191458, guid: fcaed3aba72c12f4b8c26676a8c26b3b, type: 3}
 --- !u!4 &220830626
 Transform:
@@ -181,6 +188,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 99e542f2fc43ecf408df2a632f23cf00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &220830628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 220830624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5504f8887c0b33e4bad8d0d941626a33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &347078191
@@ -542,7 +561,7 @@ GameObject:
   - component: {fileID: 1243357421}
   m_Layer: 0
   m_Name: GameManager
-  m_TagString: Untagged
+  m_TagString: GameController
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -591,6 +610,18 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 220830627}
         m_TargetAssemblyTypeName: ShowMessage, Assembly-CSharp
+        m_MethodName: OnChatMessage
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 220830628}
+        m_TargetAssemblyTypeName: ChangeAvatarByName, Assembly-CSharp
         m_MethodName: OnChatMessage
         m_Mode: 0
         m_Arguments:

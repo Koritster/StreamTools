@@ -17,10 +17,15 @@ public class AvatarSpawner : MonoBehaviour
         }
     }
 
+    public string avatarCategory; //"any" for default
+    public AvatarCharacter[] avatarCharacters;
     //Lista para los usuarios que no se desea que puedan usar comandos o sus mensajes repercutan en las acciones del programa
     public List<string> bannedUsers = new List<string>();
+    //Lista de comandos que permiten la aparicion de un avatar
+    public Dictionary<string, Animator> avatarSprites = new Dictionary<string, Animator>();
+    
+    [SerializeField] private List<string> commandsWhiteList = new List<string>();
     [SerializeField] private GameObject pf_Avatar;
-
 
     //Localizaciones donde un avatar puede aparecer al escribir un mensaje
     private Transform[] spawnLocations;
@@ -29,6 +34,8 @@ public class AvatarSpawner : MonoBehaviour
 
     public void OnChatMessage(string user, string message)
     {
+        bool canSpawn = false;
+
         //Verifica que el usuario no esté baneado
         foreach (string list in bannedUsers)
         {
@@ -38,8 +45,17 @@ public class AvatarSpawner : MonoBehaviour
             }
         }
 
+        //Verifica que ciertos comandos puedan aparecer un avatar
+        foreach(string list in commandsWhiteList)
+        {
+            if (message.ToLower().Contains(list.ToLower()))
+            {
+                canSpawn = true;
+            }
+        }
+
         //Verifica que el mensaje no haya sido un comando
-        if (message.Contains("!"))
+        if (message.Contains("!") && !canSpawn)
         {
             return;
         }
@@ -47,12 +63,23 @@ public class AvatarSpawner : MonoBehaviour
         //Instancia un nuevo avatar si aún no había uno para la persona que habló. Lo guarda en el diccionario
         if (!usersWithAvatar.ContainsKey(user))
         {
-            GameObject avatarGO = Instantiate(pf_Avatar, spawnLocations[Random.Range(0, spawnLocations.Length)]);
+            //ciclo para validar que el cambio sea adecuado para la categoría que se seleccione
+            while (true)
+            {
+                GameObject avatarGO = Instantiate(pf_Avatar, spawnLocations[Random.Range(0, spawnLocations.Length)]);
 
-            Avatar avatar = avatarGO.GetComponent<Avatar>();
-            avatar.ChangeName(user);
+                Avatar avatar = avatarGO.GetComponent<Avatar>();
+                avatar.ChangeName(user);
+                AvatarCharacter tempAvatar = avatarCharacters[Random.Range(0, avatarCharacters.Length)];
+                avatar.ChangeAvatar(tempAvatar);
 
-            usersWithAvatar.Add(user, avatar);
+                usersWithAvatar.Add(user, avatar);
+
+                if(avatarCategory == null || avatarCategory == "any" || tempAvatar.category == avatarCategory)
+                {
+                    return;
+                }
+            }
         }
         else
         {

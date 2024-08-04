@@ -41,6 +41,13 @@ public class TwitchConnect : MonoBehaviour
 
         ConnectToTwitch();
     }
+
+    public void SendTwitchMessage(string message)
+    {
+        Writer.WriteLine("PRIVMSG #" + User + " :" + message);
+        Writer.Flush();
+    }
+
     void Update()
     {
         PingCounter += Time.deltaTime;
