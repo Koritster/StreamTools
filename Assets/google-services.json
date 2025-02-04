@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "213551789467",
+    "firebase_url": "https://streamtools-7cb2a-default-rtdb.firebaseio.com",
+    "project_id": "streamtools-7cb2a",
+    "storage_bucket": "streamtools-7cb2a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:213551789467:android:dba0ac4e03e6774ba19d3e",
+        "android_client_info": {
+          "package_name": "com.Astronith.StreamTools"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8bLNWO0d7MEO-E1diku8-7HVUYaGfGYk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
