@@ -1,7 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+
 using UnityEngine;
+
+public class CrearUsuario : MonoBehaviour
+{
+    private void Start()
+    {
+        DatabaseManager.Instance.CreateUser("Usuario");
+    }
+}
 
 public class AvatarSpawner : MonoBehaviour
 {
@@ -66,12 +75,16 @@ public class AvatarSpawner : MonoBehaviour
             //ciclo para validar que el cambio sea adecuado para la categoría que se seleccione
             while (true)
             {
-                GameObject avatarGO = Instantiate(pf_Avatar, spawnLimits[Random.Range(0, spawnLimits.Length)]);
+                Vector2 randPos = new Vector2(Random.Range(spawnLimits[0].position.x, spawnLimits[1].position.x), spawnLimits[0].position.y);
+
+                GameObject avatarGO = Instantiate(pf_Avatar, randPos, Quaternion.identity);
 
                 Avatar avatar = avatarGO.GetComponent<Avatar>();
                 avatar.ChangeName(user);
                 AvatarCharacter tempAvatar = avatarCharacters[Random.Range(0, avatarCharacters.Length)];
                 avatar.ChangeAvatar(tempAvatar);
+
+                DatabaseManager.Instance.CreateUser(user);
 
                 usersWithAvatar.Add(user, avatar);
 
