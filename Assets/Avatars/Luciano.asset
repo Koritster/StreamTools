@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Luciano
   m_EditorClassIdentifier: 
   name: Luciano
-  category: A
+  category: Mario
   avatar: {fileID: 9100000, guid: 7b386c544053be143a8245a50e1bcf3e, type: 2}
