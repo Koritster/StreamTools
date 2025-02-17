@@ -28,6 +28,7 @@ public class DatabaseManager : MonoBehaviour
 
         //Crear disparador al cambiar los Koritos
         koritosDispRef = FirebaseDatabase.DefaultInstance.GetReference("users");
+        koritosDispRef.ChildChanged -= OnKoritosChanged;
         koritosDispRef.ChildChanged += OnKoritosChanged;
     }
 

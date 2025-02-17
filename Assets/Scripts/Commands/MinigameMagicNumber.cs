@@ -4,48 +4,25 @@ using Unity.VisualScripting;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class MinigameMagicNumber : MonoBehaviour
+public class MinigameMagicNumber : MinigameClass
 {
-    [SerializeField] private string[] commands;
-
-    private TwitchConnect twitch;
-
     private void Start()
     {
-        twitch = GameObject.FindWithTag("GameController").GetComponent<TwitchConnect>();
+        twitch = TwitchConnect.Instance;
         twitch.OnChatMessage.AddListener(OnChatMessage);
         twitch.OnChatMessage.AddListener(StartGameCommand);
     }
 
-    public void OnChatMessage(string user, string message)
+    public override void OnChatMessage(string user, string message)
     {
-        if (!inGame)
-        {
-            return;
-        }
+        string commandValue = DetectCommand(message);
 
-        string command = null;
+        Debug.Log(commandValue);
 
-        foreach (string com in commands)
-        {
-            if (message.ToLower().Contains(com.ToLower()))
-            {
-                command = com;
-                break;
-            }
-        }
-
-        if (command == null)
+        if (commandValue == "" || commandValue == null)
             return;
 
-        message = message.Substring(message.IndexOf(command) + command.Length).Trim();
-
-        Debug.Log(message);
-
-        if (message == "")
-            return;
-
-        if (int.TryParse(message, out int value))
+        if (int.TryParse(commandValue, out int value))
         {
             var guessedNo = GuessNumber(value);
             if (guessedNo.correct)
@@ -73,14 +50,9 @@ public class MinigameMagicNumber : MonoBehaviour
             twitch.SendTwitchMessage($"@{user} El numero no es valido");
         }
     }
-
-    //Comando para iniciar el juego
-    [SerializeField] private string commandStartGame;
-
-    public void StartGameCommand(string user, string message)
-    {
-        //Debug.Log($"{message} from {user}");
-        //Debug.Log($"{commandStartGame} correct {twitch.User}");
+    
+    public override void StartGameCommand(string user, string message)
+    {   
         if (message.Contains(commandStartGame) && user == twitch.User.ToLower())
         {
             StartGame();
@@ -92,7 +64,6 @@ public class MinigameMagicNumber : MonoBehaviour
     [SerializeField] private GameObject[] texts;
 
     private int magicNo;
-    private bool inGame;
 
     private void StartGame()
     {
