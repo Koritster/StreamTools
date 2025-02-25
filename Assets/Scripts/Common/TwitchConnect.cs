@@ -8,6 +8,8 @@ using System.IO;
 //ESTE SI SIRVE
 public class TwitchConnect : MonoBehaviour
 {
+    public static TwitchConnect Instance { get; private set; }
+
     public UnityEvent<string, string> OnChatMessage;
     TcpClient Twitch;
     StreamReader Reader;
@@ -27,6 +29,8 @@ public class TwitchConnect : MonoBehaviour
         Reader = new StreamReader(Twitch.GetStream());
         Writer = new StreamWriter(Twitch.GetStream());
 
+        OAuth = "oauth:" + OAuth;
+
         Writer.WriteLine("PASS " + OAuth);
         Writer.WriteLine("NICK " + User.ToLower());
         Writer.WriteLine("JOIN #" + Channel.ToLower());
@@ -35,12 +39,24 @@ public class TwitchConnect : MonoBehaviour
 
     private void Awake()
     {
+        if(Instance == null)
+        {
+            Instance = this;
+        }
+
         User = PlayerPrefs.GetString("Username");
         Channel = PlayerPrefs.GetString("ChannelName");
         OAuth = PlayerPrefs.GetString("Oauth");
 
         ConnectToTwitch();
     }
+
+    public void SendTwitchMessage(string message)
+    {
+        Writer.WriteLine("PRIVMSG #" + User + " :" + message);
+        Writer.Flush();
+    }
+
     void Update()
     {
         PingCounter += Time.deltaTime;

@@ -1,35 +1,51 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+
 using UnityEngine;
+
+public class CrearUsuario : MonoBehaviour
+{
+    private void Start()
+    {
+        DatabaseManager.Instance.CreateUser("Usuario");
+    }
+}
 
 public class AvatarSpawner : MonoBehaviour
 {
     private void Awake()
     {
-        //Establece las localizaciones autom·ticamente. Las localizaciones deben tener el tag SpawnAvatarLocation
+        //Establece las localizaciones autom√°ticamente. Las localizaciones deben tener el tag SpawnAvatarLocation
         GameObject[] locations = GameObject.FindGameObjectsWithTag("SpawnAvatarLocation");
 
-        spawnLocations = new Transform[locations.Length];
+        spawnLimits = new Transform[locations.Length];
         for (int i = 0; i < locations.Length; i++)
         {
-            spawnLocations[i] = locations[i].transform;
+            spawnLimits[i] = locations[i].transform;
         }
     }
 
+    public string avatarCategory; //"any" for default
+    public AvatarCharacter[] avatarCharacters;
     //Lista para los usuarios que no se desea que puedan usar comandos o sus mensajes repercutan en las acciones del programa
     public List<string> bannedUsers = new List<string>();
+    //Lista de comandos que permiten la aparicion de un avatar
+    public Dictionary<string, Animator> avatarSprites = new Dictionary<string, Animator>();
+    
+    [SerializeField] private List<string> commandsWhiteList = new List<string>();
     [SerializeField] private GameObject pf_Avatar;
 
-
     //Localizaciones donde un avatar puede aparecer al escribir un mensaje
-    private Transform[] spawnLocations;
-    //Diccionario que almacena el nombre de usuario como llave y su script de Avatar para acceder a Èl desde cualquier script
+    private Transform[] spawnLimits;
+    //Diccionario que almacena el nombre de usuario como llave y su script de Avatar para acceder a √©l desde cualquier script
     [HideInInspector] public Dictionary<string, Avatar> usersWithAvatar = new Dictionary<string, Avatar>();
 
     public void OnChatMessage(string user, string message)
     {
-        //Verifica que el usuario no estÈ baneado
+        bool canSpawn = false;
+
+        //Verifica que el usuario no est√© baneado
         foreach (string list in bannedUsers)
         {
             if (user.Contains(list.ToLower()))
@@ -38,21 +54,45 @@ public class AvatarSpawner : MonoBehaviour
             }
         }
 
+        //Verifica que ciertos comandos puedan aparecer un avatar
+        foreach(string list in commandsWhiteList)
+        {
+            if (message.ToLower().Contains(list.ToLower()))
+            {
+                canSpawn = true;
+            }
+        }
+
         //Verifica que el mensaje no haya sido un comando
-        if (message.Contains("!"))
+        if (message.Contains("!") && !canSpawn)
         {
             return;
         }
 
-        //Instancia un nuevo avatar si a˙n no habÌa uno para la persona que hablÛ. Lo guarda en el diccionario
+        //Instancia un nuevo avatar si a√∫n no hab√≠a uno para la persona que habl√≥. Lo guarda en el diccionario
         if (!usersWithAvatar.ContainsKey(user))
         {
-            GameObject avatarGO = Instantiate(pf_Avatar, spawnLocations[Random.Range(0, spawnLocations.Length)]);
+            //ciclo para validar que el cambio sea adecuado para la categor√≠a que se seleccione
+            while (true)
+            {
+                Vector2 randPos = new Vector2(Random.Range(spawnLimits[0].position.x, spawnLimits[1].position.x), spawnLimits[0].position.y);
 
-            Avatar avatar = avatarGO.GetComponent<Avatar>();
-            avatar.ChangeName(user);
+                GameObject avatarGO = Instantiate(pf_Avatar, randPos, Quaternion.identity);
 
-            usersWithAvatar.Add(user, avatar);
+                Avatar avatar = avatarGO.GetComponent<Avatar>();
+                avatar.ChangeName(user);
+                AvatarCharacter tempAvatar = avatarCharacters[Random.Range(0, avatarCharacters.Length)];
+                avatar.ChangeAvatar(tempAvatar);
+
+                DatabaseManager.Instance.CreateUser(user);
+
+                usersWithAvatar.Add(user, avatar);
+
+                if(avatarCategory == null || avatarCategory == "any" || tempAvatar.category == avatarCategory)
+                {
+                    return;
+                }
+            }
         }
         else
         {

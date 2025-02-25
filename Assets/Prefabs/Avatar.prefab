@@ -353,7 +353,8 @@ GameObject:
   - component: {fileID: 3944841769613568529}
   - component: {fileID: 8413750975616004887}
   - component: {fileID: 2036380114917058776}
-  m_Layer: 0
+  - component: {fileID: 1709188530780777471}
+  m_Layer: 10
   m_Name: Avatar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -517,7 +518,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 0
   m_CollisionDetection: 1
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!95 &2036380114917058776
 Animator:
   serializedVersion: 5
@@ -539,6 +540,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1709188530780777471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8635274958248191458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ef56c55f4829a84296fcaa226040ced, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8848119780635033287
 GameObject:
   m_ObjectHideFlags: 0
