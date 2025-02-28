@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GalleraMinigame : MonoBehaviour
+public class GalleraMinigame : MinigameClass
 {
     // Almacena las apuestas realizadas a favor del Gallo X.
     private Dictionary<string, int> apuestasA = new Dictionary<string, int>();

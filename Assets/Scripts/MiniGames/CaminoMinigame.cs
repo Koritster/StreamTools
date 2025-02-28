@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CaminoMinigame : MonoBehaviour
+public class CaminoMinigame : MinigameClass
 {
     private List<string> jugadores = new List<string>();
     private List<string> sobrevivientes = new List<string>();
