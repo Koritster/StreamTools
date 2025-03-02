@@ -18,7 +18,15 @@ public class AvatarWanderingState : AvatarBaseState
         Debug.Log("EYEYEYEY ME VOY A MOVER A " + Ctx.NewLocationX);
         Ctx.AvatarAnimator.Play("Walk");
         Debug.Log("ESTARE EN WANDERING POR " + Ctx.StateDuration + "s");
-        Ctx.AvatarOrientation.flipX = Ctx.Avatar.transform.position.x >= Ctx.NewLocationX;
+        if(Ctx.Avatar.transform.position.x >= Ctx.NewLocationX)
+        {
+            Ctx.Avatar.transform.localScale = new Vector2(-1f, 1f);
+        }
+        else
+        {
+            Ctx.Avatar.transform.localScale = new Vector2(1f, 1f);
+        }
+        
     }
 
     public override void UpdateState()
