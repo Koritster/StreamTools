@@ -15,16 +15,21 @@ public class AvatarWanderingState : AvatarBaseState
         Ctx.StateDuration = Random.Range(4, 9);
         Ctx.ActualCoroutine = Ctx.StartCoroutine(StateTimer());
         Ctx.NewLocationX = Random.Range(-7f, 7f);
+
         Debug.Log("EYEYEYEY ME VOY A MOVER A " + Ctx.NewLocationX);
-        Ctx.AvatarAnimator.Play("Walk");
+
+        Ctx.AvatarAnimator.Play("Walk", 0);
+
         Debug.Log("ESTARE EN WANDERING POR " + Ctx.StateDuration + "s");
+
+        //Gira el avatar hacia la direccion a la que avanza
         if(Ctx.Avatar.transform.position.x >= Ctx.NewLocationX)
         {
-            Ctx.Avatar.transform.localScale = new Vector2(-1f, 1f);
+            Ctx.AvatarSkin.transform.localScale = new Vector2(-1f, 1f);
         }
         else
         {
-            Ctx.Avatar.transform.localScale = new Vector2(1f, 1f);
+            Ctx.AvatarSkin.transform.localScale = new Vector2(1f, 1f);
         }
         
     }
@@ -46,13 +51,14 @@ public class AvatarWanderingState : AvatarBaseState
 
     public override void InitializeSubState()       //Solo los root ocupan esta funcion
     {
-        /*
-        if(*Condicion para el substate*)
+        if (Ctx.IsChattingActive)
         {
-            SetSubState(Factory.Jump());
+            SetSubState(Factory.Speaking());
         }
-         
-         */
+        else
+        {
+            SetSubState(Factory.Empty());
+        }
     }
 
     public override void CheckSwitchStates()

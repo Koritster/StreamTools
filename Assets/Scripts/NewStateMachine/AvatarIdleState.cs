@@ -16,7 +16,7 @@ public class AvatarIdleState : AvatarBaseState
         Ctx.StateDuration = Random.Range(4, 12);
         Debug.Log("ESTARE EN IDLE POR " + Ctx.StateDuration + "s");
         Ctx.ActualCoroutine = Ctx.StartCoroutine(StateTimer());
-        Ctx.AvatarAnimator.Play("Idle");
+        Ctx.AvatarAnimator.Play("Idle", 0);
     }
 
     public override void UpdateState()
@@ -34,7 +34,14 @@ public class AvatarIdleState : AvatarBaseState
     
     public override void InitializeSubState()
     {
-        
+        if (Ctx.IsChattingActive)
+        {
+            SetSubState(Factory.Speaking());
+        }
+        else
+        {
+            SetSubState(Factory.Empty());
+        }
     }
 
     public override void CheckSwitchStates()
