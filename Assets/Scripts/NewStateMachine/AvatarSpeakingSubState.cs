@@ -9,10 +9,18 @@ public class AvatarSpeakingSubState : AvatarBaseState
     public override void EnterState()
     {
         Debug.Log("SPEAKING SUBSTATE ACTIVO");
+        Ctx.AvatarAnimator.Play("Talk", 1);
     }
 
     public override void UpdateState()
     {
+        Ctx.TimerMessages += Time.deltaTime;
+
+        if (Ctx.TimerMessages >= Ctx.TimeToQuitMessage)
+        {
+            Ctx.HideMessage();
+            Ctx.IsChattingActive = false;
+        }
 
         //El cambio de estado siempre va al final
         CheckSwitchStates();
@@ -30,6 +38,10 @@ public class AvatarSpeakingSubState : AvatarBaseState
 
     public override void CheckSwitchStates()
     {
-
+        if (!Ctx.IsChattingActive)
+        {
+            SwitchState(Factory.Empty());
+        }
+        
     }
 }

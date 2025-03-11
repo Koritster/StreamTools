@@ -4,7 +4,8 @@ enum AvatarStates
 {
     idle,
     wandering,
-    speaking
+    speaking,
+    subEmpty
 }
 
 public class AvatarStateFactory
@@ -18,6 +19,7 @@ public class AvatarStateFactory
         _states[AvatarStates.idle] = new AvatarIdleState(_context, this);
         _states[AvatarStates.wandering] = new AvatarWanderingState(_context, this);
         _states[AvatarStates.speaking] = new AvatarSpeakingSubState(_context, this);
+        _states[AvatarStates.subEmpty] = new AvatarEmptySubState(_context, this); //Estado vacio para cuando no se deba ejecutar el speaking state
     }
 
     public AvatarBaseState Idle()
@@ -31,5 +33,9 @@ public class AvatarStateFactory
     public AvatarBaseState Speaking()
     {
         return _states[AvatarStates.speaking];
+    }
+    public AvatarBaseState Empty()
+    {
+        return _states[AvatarStates.subEmpty];
     }
 }
