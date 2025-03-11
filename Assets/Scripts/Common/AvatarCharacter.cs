@@ -7,5 +7,5 @@ public class AvatarCharacter : ScriptableObject
 {
     public new string name;
     public string category;
-    public RuntimeAnimatorController avatar;
+    public GameObject avatarPrefab;
 }

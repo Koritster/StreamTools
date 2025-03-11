@@ -14,7 +14,7 @@ public class Avatar : MonoBehaviour
 
     public void ChangeAvatar(AvatarCharacter avatar)
     {
-        GetComponent<Animator>().runtimeAnimatorController = avatar.avatar;
+        
     }
     
     #region UI
