@@ -16,7 +16,7 @@ public class AvatarStateMachine : MonoBehaviour
     private float _movementSpeed = 1;
     private Animator _avatarAnimator;
     private GameObject _avatar;
-    [SerializeField] private GameObject _avatarSkin;
+    private GameObject _avatarSkin;
     private bool _timerHasEnded;
     private Coroutine _actualCoroutine;
 
@@ -52,13 +52,14 @@ public class AvatarStateMachine : MonoBehaviour
         _states = new AvatarStateFactory(this);
         _currentState = _states.Idle();
         _avatar = gameObject;
+        _avatarSkin = transform.GetChild(1).gameObject;
         _avatarAnimator = _avatarSkin.GetComponent<Animator>();
 
 
         //Al final siempre
         _currentState.EnterState();
     }
-
+    
     void Start()
     {
         Physics2D.IgnoreLayerCollision(10, 10);
