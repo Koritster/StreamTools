@@ -85,7 +85,12 @@ public class AvatarStateMachine : MonoBehaviour
 
     public void ChangeAvatar(AvatarCharacter avatar)
     {
-        GetComponent<Animator>().runtimeAnimatorController = avatar.avatar;
+        Destroy(_avatarSkin);
+        Instantiate(avatar.avatarPrefab, _avatar.transform);
+
+        _avatarSkin = transform.GetChild(1).gameObject;
+        _avatarAnimator = _avatarSkin.GetComponent<Animator>();
+        //GetComponent<Animator>().runtimeAnimatorController = avatar.avatarPrefab;
     }
 
     //Cambiar el nombre mostrado del usuario. Esta función se llama desde el AvatarSpawner.cs

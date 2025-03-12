@@ -26,7 +26,6 @@ public class AvatarSpawner : MonoBehaviour
         }
     }
 
-    public string avatarCategory; //"any" for default
     public AvatarCharacter[] avatarCharacters;
     //Lista para los usuarios que no se desea que puedan usar comandos o sus mensajes repercutan en las acciones del programa
     public List<string> bannedUsers = new List<string>();
@@ -39,7 +38,7 @@ public class AvatarSpawner : MonoBehaviour
     //Localizaciones donde un avatar puede aparecer al escribir un mensaje
     private Transform[] spawnLimits;
     //Diccionario que almacena el nombre de usuario como llave y su script de Avatar para acceder a él desde cualquier script
-    [HideInInspector] public Dictionary<string, Avatar> usersWithAvatar = new Dictionary<string, Avatar>();
+    [HideInInspector] public Dictionary<string, AvatarStateMachine> usersWithAvatar = new Dictionary<string, AvatarStateMachine>();
 
     public void OnChatMessage(string user, string message)
     {
@@ -79,7 +78,7 @@ public class AvatarSpawner : MonoBehaviour
 
                 GameObject avatarGO = Instantiate(pf_Avatar, randPos, Quaternion.identity);
 
-                Avatar avatar = avatarGO.GetComponent<Avatar>();
+                AvatarStateMachine avatar = avatarGO.GetComponent<AvatarStateMachine>();
                 avatar.ChangeName(user);
                 AvatarCharacter tempAvatar = avatarCharacters[Random.Range(0, avatarCharacters.Length)];
                 avatar.ChangeAvatar(tempAvatar);
@@ -87,11 +86,6 @@ public class AvatarSpawner : MonoBehaviour
                 DatabaseManager.Instance.CreateUser(user);
 
                 usersWithAvatar.Add(user, avatar);
-
-                if(avatarCategory == null || avatarCategory == "any" || tempAvatar.category == avatarCategory)
-                {
-                    return;
-                }
             }
         }
         else
