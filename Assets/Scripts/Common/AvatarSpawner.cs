@@ -72,21 +72,18 @@ public class AvatarSpawner : MonoBehaviour
         if (!usersWithAvatar.ContainsKey(user))
         {
             //ciclo para validar que el cambio sea adecuado para la categoría que se seleccione
-            while (true)
-            {
-                Vector2 randPos = new Vector2(Random.Range(spawnLimits[0].position.x, spawnLimits[1].position.x), spawnLimits[0].position.y);
+            Vector2 randPos = new Vector2(Random.Range(spawnLimits[0].position.x, spawnLimits[1].position.x), spawnLimits[0].position.y);
 
-                GameObject avatarGO = Instantiate(pf_Avatar, randPos, Quaternion.identity);
+            GameObject avatarGO = Instantiate(pf_Avatar, randPos, Quaternion.identity);
 
-                AvatarStateMachine avatar = avatarGO.GetComponent<AvatarStateMachine>();
-                avatar.ChangeName(user);
-                AvatarCharacter tempAvatar = avatarCharacters[Random.Range(0, avatarCharacters.Length)];
-                avatar.ChangeAvatar(tempAvatar);
+            AvatarStateMachine avatar = avatarGO.GetComponent<AvatarStateMachine>();
+            avatar.ChangeName(user);
+            AvatarCharacter tempAvatar = avatarCharacters[Random.Range(0, avatarCharacters.Length)];
+            avatar.ChangeAvatar(tempAvatar);
 
-                DatabaseManager.Instance.CreateUser(user);
+            DatabaseManager.Instance.CreateUser(user);
 
-                usersWithAvatar.Add(user, avatar);
-            }
+            usersWithAvatar.Add(user, avatar);
         }
         else
         {

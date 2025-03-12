@@ -49,15 +49,9 @@ public class AvatarStateMachine : MonoBehaviour
 
     private void Awake()
     {
-        _states = new AvatarStateFactory(this);
-        _currentState = _states.Idle();
         _avatar = gameObject;
-        _avatarSkin = transform.GetChild(1).gameObject;
-        _avatarAnimator = _avatarSkin.GetComponent<Animator>();
 
-
-        //Al final siempre
-        _currentState.EnterState();
+        StartCoroutine(AwakeCoroutine());
     }
     
     void Start()
@@ -69,7 +63,6 @@ public class AvatarStateMachine : MonoBehaviour
     
     void Update()
     {
-
         //Timer que cuenta la inactividad del viewer para desaparecer el avatar despues de cierto tiempo
         _timerAvatar += Time.deltaTime;
         if (_timerAvatar >= timeToDissapear)
@@ -77,7 +70,14 @@ public class AvatarStateMachine : MonoBehaviour
             DissapearAvatar();
         }
 
-        _currentState.UpdateStates();
+        try
+        {
+            _currentState.UpdateStates();
+        }
+        catch
+        {
+            Debug.Log("Buscando...");
+        }
     }
 
 
@@ -86,8 +86,23 @@ public class AvatarStateMachine : MonoBehaviour
 
     public void ChangeAvatar(AvatarCharacter avatar)
     {
-        Destroy(_avatarSkin);
-        Instantiate(avatar.avatarPrefab, _avatar.transform);
+        try
+        {
+            Destroy(_avatarSkin);
+        }
+        catch
+        {
+            Debug.Log("Instanciando avatar...");
+        }
+
+        try
+        {
+            Instantiate(avatar.avatarPrefab, _avatar.transform);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogException(ex);
+        }
 
         _avatarSkin = transform.GetChild(1).gameObject;
         _avatarAnimator = _avatarSkin.GetComponent<Animator>();
@@ -143,5 +158,16 @@ public class AvatarStateMachine : MonoBehaviour
 
     #endregion
 
+    IEnumerator AwakeCoroutine()
+    {
+        yield return new WaitForSeconds(0.5f);
+        _states = new AvatarStateFactory(this);
+        _currentState = _states.Idle();
+        //_avatarSkin = transform.GetChild(1).gameObject;
+        //_avatarAnimator = _avatarSkin.GetComponent<Animator>();
 
+
+        //Al final siempre
+        _currentState.EnterState();
+    }
 }

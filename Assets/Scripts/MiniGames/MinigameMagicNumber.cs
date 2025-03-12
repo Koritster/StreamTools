@@ -17,8 +17,6 @@ public class MinigameMagicNumber : MinigameClass
     {
         string commandValue = DetectCommand(message);
 
-        Debug.Log(commandValue);
-
         if (commandValue == "" || commandValue == null)
             return;
 
