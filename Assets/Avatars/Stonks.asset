@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aafc4415549380c408e2dec891986f64, type: 3}
-  m_Name: Luciano
+  m_Name: Stonks
   m_EditorClassIdentifier: 
-  name: Luciano
-  category: Mario
-  avatar: {fileID: 9100000, guid: 7b386c544053be143a8245a50e1bcf3e, type: 2}
+  name: Stonks
+  category: A
+  avatarPrefab: {fileID: 8425651383599682159, guid: 4890fdc2c8f6f7249a7ff4624ccfa9df, type: 3}

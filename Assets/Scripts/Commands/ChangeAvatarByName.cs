@@ -23,7 +23,7 @@ public class ChangeAvatarByName : MonoBehaviour
 
         foreach(string com in commands)
         {
-            Debug.Log($"{message.ToLower()} comparing with {com.ToLower()}");
+            //Debug.Log($"{message.ToLower()} comparing with {com.ToLower()}");
             if (message.ToLower().Contains(com.ToLower()))
             {
                 command = com;
