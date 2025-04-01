@@ -177,6 +177,7 @@ public class DatabaseManager : MonoBehaviour
         Task.Run(async () =>
         {
             avatar = await OnGetAvatar(name);
+            Debug.Log($"El avatar del jugador {name} es {avatar}");
         });
 
         return avatar;
