@@ -217,10 +217,15 @@ public class DatabaseManager : MonoBehaviour
 
             if (avatarSpawner.usersWithAvatar.ContainsKey(user))
             {
-                AvatarCharacter tempAvatar = avatarSpawner.avatarCharacters[UnityEngine.Random.Range(0, avatarSpawner.avatarCharacters.Length)];
-
-                AvatarStateMachine avStateMachine = avatarSpawner.usersWithAvatar[user];
-                avStateMachine.ChangeAvatar(tempAvatar);
+                //AvatarCharacter tempAvatar = avatarSpawner.avatarCharacters[UnityEngine.Random.Range(0, avatarSpawner.avatarCharacters.Length)];
+                foreach (AvatarCharacter tempAvatar in avatarSpawner.avatarCharacters)
+                {
+                    if (tempAvatar.name == newAvatar)
+                    {
+                        avatarSpawner.usersWithAvatar[user].ChangeAvatar(tempAvatar);
+                        break;
+                    }
+                }
             }
         }
     }
