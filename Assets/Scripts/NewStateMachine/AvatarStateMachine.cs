@@ -19,6 +19,7 @@ public class AvatarStateMachine : MonoBehaviour
     private GameObject _avatarSkin;
     private bool _timerHasEnded;
     private Coroutine _actualCoroutine;
+    private bool _wasClicked;
 
     //UI variables
     public string user;
@@ -28,7 +29,7 @@ public class AvatarStateMachine : MonoBehaviour
 
     //Timer Variables
     [SerializeField] private float _timeToQuitMessage; //Se queda
-    [SerializeField] private float timeToDissapear; //Se queda
+    [SerializeField] private float _timeToDissapear; //Se queda
     private bool _isChattingActive;
     private float _timerMessages = 0f; //    X??
     private float _timerAvatar = 0f; //      X??
@@ -46,6 +47,7 @@ public class AvatarStateMachine : MonoBehaviour
     public bool IsChattingActive { get { return _isChattingActive; } set { _isChattingActive = value; } }
     public float TimeToQuitMessage { get { return _timeToQuitMessage; } }
     public float TimerMessages { get { return _timerMessages; } set { _timerMessages = value; } }
+    public bool WasClicked { get { return _wasClicked; } set { _wasClicked = value; } }
 
     private void Awake()
     {
@@ -65,7 +67,7 @@ public class AvatarStateMachine : MonoBehaviour
     {
         //Timer que cuenta la inactividad del viewer para desaparecer el avatar despues de cierto tiempo
         _timerAvatar += Time.deltaTime;
-        if (_timerAvatar >= timeToDissapear)
+        if (_timerAvatar >= _timeToDissapear)
         {
             DissapearAvatar();
         }
@@ -78,8 +80,13 @@ public class AvatarStateMachine : MonoBehaviour
         {
             Debug.Log("Buscando...");
         }
+
     }
 
+    private void OnMouseDown()
+    {
+        _wasClicked = true;
+    }
 
 
     #region Metodos propios
@@ -127,21 +134,6 @@ public class AvatarStateMachine : MonoBehaviour
         _timerMessages = 0f;
         _timerAvatar = 0f;
         
-        _isChattingActive = true;
-    }
-
-
-    //Metodo para emular el mensaje sin hacer conexion con el twitch connect por que no le entendi ni pijo a todo lo que hay que meterle
-    //PD: esto se mete en un boton en el escenario, asi es, no era necesario crear un metodo nuevo y se pudo haber usado el original pero lo dejare un rato por los jajas
-    public void MessageEmulation(string message)
-    {
-        go_textBox.SetActive(true);
-        txt_message.text = message;
-
-        //Reinicia los timers
-        _timerMessages = 0f;
-        _timerAvatar = 0f;
-
         _isChattingActive = true;
     }
 
