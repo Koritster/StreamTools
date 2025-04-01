@@ -78,8 +78,25 @@ public class AvatarSpawner : MonoBehaviour
 
             AvatarStateMachine avatar = avatarGO.GetComponent<AvatarStateMachine>();
             avatar.ChangeName(user);
-            AvatarCharacter tempAvatar = avatarCharacters[Random.Range(0, avatarCharacters.Length)];
-            avatar.ChangeAvatar(tempAvatar);
+
+            string avatarDB = DatabaseManager.Instance.GetAvatar(user);
+            //Si el avatar es default, cambiarlo a uno aleatorio
+            if (avatarDB == default)
+            {
+                AvatarCharacter tempAvatar = avatarCharacters[Random.Range(0, avatarCharacters.Length)];
+                DatabaseManager.Instance.UpdateAvatar(user, tempAvatar.name);
+            }
+            else
+            {
+                foreach(AvatarCharacter tempAvatar in avatarCharacters)
+                {
+                    if(tempAvatar.name == avatarDB)
+                    {
+                        avatar.ChangeAvatar(tempAvatar);
+                        break;
+                    }
+                }
+            }
 
             DatabaseManager.Instance.CreateUser(user);
 

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class TransparentWindow : MonoBehaviour
 {
+    private bool transparent;
+
     private const int WS_EX_LAYERED = 0x00080000;
     private const int WS_EX_TRANSPARENT = 0x00000020;
     private const int GWL_EXSTYLE = -20;
@@ -33,6 +35,11 @@ public class TransparentWindow : MonoBehaviour
 
     private void Start()
     {
+        //No la hace transparente si no esta activo
+        if (!transparent)
+        {
+            return;
+        }
 
 #if !UNITY_EDITOR
         hWnd = GetActiveWindow();
