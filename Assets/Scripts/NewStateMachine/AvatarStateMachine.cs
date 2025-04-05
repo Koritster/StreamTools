@@ -15,11 +15,15 @@ public class AvatarStateMachine : MonoBehaviour
     private float _newLocationX;
     private float _movementSpeed = 1;
     private Animator _avatarAnimator;
+    private Rigidbody2D _avatarRigidBody;
     private GameObject _avatar;
     private GameObject _avatarSkin;
     private bool _timerHasEnded;
     private Coroutine _actualCoroutine;
     private bool _wasClicked;
+    private float _avatarVelocity;
+    private bool _isFlyingAway;
+    private bool _alreadyDisappeared;
 
     //UI variables
     public string user;
@@ -40,6 +44,7 @@ public class AvatarStateMachine : MonoBehaviour
     public float NewLocationX { get { return _newLocationX; } set { _newLocationX = value; } }
     public float MovementSpeed { get { return _movementSpeed; } }
     public Animator AvatarAnimator { get { return _avatarAnimator; } }
+    public Rigidbody2D AvatarRigidBody { get { return _avatarRigidBody; } }
     public GameObject Avatar { get { return _avatar; } }
     public GameObject AvatarSkin { get { return _avatarSkin; } set { _avatarSkin = value; } }
     public bool TimerHasEnded { get { return _timerHasEnded; } set { _timerHasEnded = value; } }
@@ -48,11 +53,15 @@ public class AvatarStateMachine : MonoBehaviour
     public float TimeToQuitMessage { get { return _timeToQuitMessage; } }
     public float TimerMessages { get { return _timerMessages; } set { _timerMessages = value; } }
     public bool WasClicked { get { return _wasClicked; } set { _wasClicked = value; } }
+    public float AvatarVelocity { get { return _avatarVelocity; } set { _avatarVelocity = value; } }
+    public bool IsFlyingAway { get { return _isFlyingAway; } set { _isFlyingAway = value; } }
+    public bool AlreadyDisappeared { get { return _alreadyDisappeared; } set { _alreadyDisappeared = value; } }
 
     private void Awake()
     {
         _avatar = gameObject;
 
+        _avatarRigidBody = GetComponent<Rigidbody2D>();
         StartCoroutine(AwakeCoroutine());
     }
     
@@ -86,8 +95,29 @@ public class AvatarStateMachine : MonoBehaviour
     private void OnMouseDown()
     {
         _wasClicked = true;
+        //Debug.Log("Clickeado");
     }
 
+    private void OnMouseUp()
+    {
+        _wasClicked = false;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("TopLimitTrigger"))
+        {
+            _isFlyingAway = true;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("TopLimitTrigger"))
+        {
+            _isFlyingAway = false;
+        }
+    }
 
     #region Metodos propios
 
@@ -155,8 +185,8 @@ public class AvatarStateMachine : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         _states = new AvatarStateFactory(this);
         _currentState = _states.Idle();
-        //_avatarSkin = transform.GetChild(1).gameObject;
-        //_avatarAnimator = _avatarSkin.GetComponent<Animator>();
+        _avatarSkin = transform.GetChild(1).gameObject;
+        _avatarAnimator = _avatarSkin.GetComponent<Animator>();
 
 
         //Al final siempre

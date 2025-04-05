@@ -128,7 +128,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -202,7 +202,7 @@ MonoBehaviour:
   txt_message: {fileID: 3370355804791581607}
   txt_user: {fileID: 5376180135547067280}
   _timeToQuitMessage: 10
-  timeToDissapear: 600
+  _timeToDissapear: 600
 --- !u!1 &738238097861028219
 GameObject:
   m_ObjectHideFlags: 0

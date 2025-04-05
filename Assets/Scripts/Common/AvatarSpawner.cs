@@ -90,7 +90,16 @@ public class AvatarSpawner : MonoBehaviour
             //Habilita nuevamente el avatar, en vez de instanciar uno nuevo
             if (!usersWithAvatar[user].gameObject.activeSelf)
             {
-                usersWithAvatar[user].gameObject.SetActive(true);
+                if(usersWithAvatar[user].gameObject.transform.position.y < -6f)//Si el avatar se encuentra fuera de pantalla
+                {
+                    Vector2 randPos = new Vector2(Random.Range(spawnLimits[0].position.x, spawnLimits[1].position.x), spawnLimits[0].position.y);
+                    usersWithAvatar[user].transform.position = randPos;
+                    usersWithAvatar[user].gameObject.SetActive(true);
+                }
+                else
+                {
+                    usersWithAvatar[user].gameObject.SetActive(true);
+                }
             }
         }
     }

@@ -6,6 +6,7 @@ enum AvatarStates
     wandering,
     speaking,
     thrown,
+    flewAway,
     subEmpty,
 }
 
@@ -21,6 +22,7 @@ public class AvatarStateFactory
         _states[AvatarStates.wandering] = new AvatarWanderingState(_context, this);
         _states[AvatarStates.speaking] = new AvatarSpeakingSubState(_context, this);
         _states[AvatarStates.thrown] = new AvatarThrownState(_context, this);
+        _states[AvatarStates.flewAway] = new AvatarFlewAwayState(_context, this);
         _states[AvatarStates.subEmpty] = new AvatarEmptySubState(_context, this); //Estado vacio para cuando no se deba ejecutar el speaking state
     }
 
@@ -39,6 +41,11 @@ public class AvatarStateFactory
     public AvatarBaseState Thrown()
     {
         return _states[AvatarStates.thrown];
+    }
+
+    public AvatarBaseState FlewAway()
+    {
+        return _states[AvatarStates.flewAway];
     }
 
     public AvatarBaseState Empty()
