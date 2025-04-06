@@ -155,6 +155,31 @@ public class DatabaseManager : MonoBehaviour
 
     #endregion
 
+    public async void SpawnAvatar(string name)
+    {
+        string avatar = await OnGetAvatar(name);
+        Debug.Log($"El avatar de la base de datos es {avatar}");
+        //Si el avatar es default, cambiarlo a uno aleatorio
+        if (avatar == default)
+        {
+            AvatarCharacter tempAvatar = avatarSpawner.avatarCharacters[UnityEngine.Random.Range(0, avatarSpawner.avatarCharacters.Length)];
+            Debug.Log($"El avatar seleccionado aleatoriamente es {tempAvatar.name}");
+            DatabaseManager.Instance.UpdateAvatar(name, tempAvatar.name);
+        }
+        else
+        {
+            Debug.Log("El jugador ya cuenta con un avatar");
+            foreach (AvatarCharacter tempAvatar in avatarSpawner.avatarCharacters)
+            {
+                if (tempAvatar.name == avatar)
+                {
+                    avatarSpawner.usersWithAvatar[name].ChangeAvatar(tempAvatar);
+                    break;
+                }
+            }
+        }
+    }
+
     public async void UpdateAvatar(string name, string avatar)
     {
         await ModifyAvatarTask(name, avatar);
@@ -171,18 +196,7 @@ public class DatabaseManager : MonoBehaviour
         Debug.Log("Avatar cambiado exitosamente");
     }
 
-    public string GetAvatar(string name)
-    {
-        string avatar = default;
-        Task.Run(async () =>
-        {
-            avatar = await OnGetAvatar(name);
-            Debug.Log($"El avatar del jugador {name} es {avatar}");
-        });
-
-        return avatar;
-    }
-
+    //Buscar avatar en la bd, retornar default si no tiene el usuario
     private async Task<string> OnGetAvatar(string name)
     {
         DataSnapshot snapshot = await (UserSnapshot(name));
