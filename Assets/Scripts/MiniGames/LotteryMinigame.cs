@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq; // Permite usar consultas LINQ para manipular colecciones de datos
@@ -14,18 +14,27 @@ public class LotteryMinigame : MinigameClass
     {
         twitch = TwitchConnect.Instance;
         twitch.OnChatMessage.AddListener(OnChatMessage);
-        StartCoroutine(CallElementsRoutine()); // Inicia el anuncio autom�tico de elementos cada 8 segundos
+        twitch.OnChatMessage.AddListener(StartGameCommand);
     }
 
-    // Comienza el juego y da una tarjeta �nica a cada jugador
+    // Comienza el juego y da una tarjeta única a cada jugador
     public override void StartGameCommand(string user, string message)
     {
+        if (message.ToLower() == "!loteria")
+        {
+            gameStarted = true; // Activa el juego
+            playerCards.Clear(); // Limpia tarjetas anteriores
+            calledElements.Clear(); // Reinicia elementos ya llamados
+            twitch.SendTwitchMessage("¡Lotería iniciada! Usa !tarjeta para recibir la tuya.");
+        }
+
         if (message == "!tarjeta")
         {
             if (!playerCards.ContainsKey(user))
             {
                 playerCards[user] = GenerateCard();
                 twitch.SendTwitchMessage(user + ", tu tarjeta es: " + string.Join(", ", playerCards[user]));
+                StartCoroutine(CallElementsRoutine()); // Inicia el anuncio automático de elementos cada 8 segundos
             }
             else
             {
@@ -34,7 +43,7 @@ public class LotteryMinigame : MinigameClass
         }
     }
 
-    // Genera una tarjeta aleatoria con 4 elementos �nicos
+    // Genera una tarjeta aleatoria con 4 elementos únicos
     private HashSet<string> GenerateCard()
     {
         HashSet<string> card = new HashSet<string>();
@@ -55,12 +64,12 @@ public class LotteryMinigame : MinigameClass
             string element = parts[1];
             if (playerCards.ContainsKey(user) && playerCards[user].Contains(element) && calledElements.Contains(element))
             {
-                playerCards[user].Remove(element); // Marca el elemento quit�ndolo de la tarjeta
+                playerCards[user].Remove(element); // Marca el elemento quitándolo de la tarjeta
                 twitch.SendTwitchMessage(user + " ha marcado " + element);
 
                 if (playerCards[user].Count == 0) // Si ya no quedan elementos, gana el jugador
                 {
-                    twitch.SendTwitchMessage(user + " ha ganado la loter�a!");
+                    twitch.SendTwitchMessage(user + " ha ganado la lotería!");
                     gameStarted = false;
                     playerCards.Clear(); // Reinicia el juego
                     calledElements.Clear();
@@ -77,11 +86,20 @@ public class LotteryMinigame : MinigameClass
             yield return new WaitForSeconds(8);
             if (!gameStarted) continue;
 
+            if (calledElements.Count >= allElements.Count)
+            {
+                twitch.SendTwitchMessage("🎉 ¡Todos los elementos han sido anunciados! El juego termina sin ganadores.");
+                gameStarted = false;
+                playerCards.Clear();
+                calledElements.Clear();
+                yield break; // Sale de la corrutina
+            }
+
             string newElement;
             do
             {
                 newElement = allElements[Random.Range(0, allElements.Count)];
-            } while (calledElements.Contains(newElement)); // Asegura que no se repita
+            } while (calledElements.Contains(newElement));
 
             calledElements.Add(newElement);
             twitch.SendTwitchMessage("Nuevo elemento: " + newElement);

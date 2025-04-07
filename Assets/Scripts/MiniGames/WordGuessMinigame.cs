@@ -24,7 +24,7 @@ public class WordGuessMinigame : MinigameClass
             secretWord = message.Substring(9).ToLower(); // Establece la palabra
             gameStarted = true;
             guessedUsers.Clear(); // Reinicia los intentos de usuarios.
-            twitch.SendTwitchMessage("✅ ¡La palabra ha sido establecida! Los espectadores pueden adivinar usando !guess <palabra>.");
+            twitch.SendTwitchMessage($"✅ ¡La palabra ha sido establecida! Tiene {secretWord.Length} letras. Usa !guess <palabra> para intentar adivinar.");
         }
     }
 
