@@ -14,10 +14,10 @@ public class AvatarStateMachine : MonoBehaviour
     private int _stateDuration;
     private float _newLocationX;
     private float _movementSpeed = 1;
-    private Animator _avatarAnimator;
+    [SerializeField] private Animator _avatarAnimator;
     private Rigidbody2D _avatarRigidBody;
     private GameObject _avatar;
-    private GameObject _avatarSkin;
+    [SerializeField] private GameObject _avatarSkin;
     private bool _timerHasEnded;
     private Coroutine _actualCoroutine;
     private bool _wasClicked;
@@ -134,13 +134,15 @@ public class AvatarStateMachine : MonoBehaviour
 
         try
         {
+            
             Instantiate(avatar.avatarPrefab, _avatar.transform);
+            StartCoroutine(AwakeCoroutine());
         }
         catch (System.Exception ex)
         {
             Debug.LogException(ex);
         }
-
+        
         _avatarSkin = transform.GetChild(1).gameObject;
         _avatarAnimator = _avatarSkin.GetComponent<Animator>();
         //GetComponent<Animator>().runtimeAnimatorController = avatar.avatarPrefab;
@@ -182,7 +184,7 @@ public class AvatarStateMachine : MonoBehaviour
 
     IEnumerator AwakeCoroutine()
     {
-        yield return new WaitForSeconds(1f);
+        yield return null;
         _states = new AvatarStateFactory(this);
         _currentState = _states.Idle();
         _avatarSkin = transform.GetChild(1).gameObject;
