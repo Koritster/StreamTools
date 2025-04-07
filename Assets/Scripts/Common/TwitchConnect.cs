@@ -73,7 +73,6 @@ public class TwitchConnect : MonoBehaviour
         if (Twitch.Available > 0)
         {
             string message = Reader.ReadLine();
-            Debug.Log(message);
 
             if (message.Contains("PRIVMSG"))
             {

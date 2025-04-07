@@ -33,8 +33,8 @@ public class DatabaseManager : MonoBehaviour
 
         //Crear disparador al cambiar los Koritos
         koritosDispRef = FirebaseDatabase.DefaultInstance.GetReference("users");
-        koritosDispRef.ChildChanged -= OnKoritosChanged;
-        koritosDispRef.ChildChanged += OnKoritosChanged;
+        //koritosDispRef.ChildChanged -= OnKoritosChanged;
+        //koritosDispRef.ChildChanged += OnKoritosChanged;
 
         koritosDispRef.ChildChanged -= OnAvatarChanged;
         koritosDispRef.ChildChanged += OnAvatarChanged;
@@ -158,6 +158,7 @@ public class DatabaseManager : MonoBehaviour
     public async void SpawnAvatar(string name)
     {
         string avatar = await OnGetAvatar(name);
+
         Debug.Log($"El avatar de la base de datos es {avatar}");
         //Si el avatar es default, cambiarlo a uno aleatorio
         if (avatar == default)
@@ -193,7 +194,7 @@ public class DatabaseManager : MonoBehaviour
             { "avatar", avatar }
         });
 
-        Debug.Log("Avatar cambiado exitosamente");
+        Debug.LogWarning("Avatar cambiado exitosamente");
     }
 
     //Buscar avatar en la bd, retornar default si no tiene el usuario

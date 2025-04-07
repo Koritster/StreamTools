@@ -182,7 +182,7 @@ public class AvatarStateMachine : MonoBehaviour
 
     IEnumerator AwakeCoroutine()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f);
         _states = new AvatarStateFactory(this);
         _currentState = _states.Idle();
         _avatarSkin = transform.GetChild(1).gameObject;

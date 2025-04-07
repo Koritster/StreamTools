@@ -13,7 +13,7 @@ public class ChangeAvatarByName : MonoBehaviour
     {
         avatarSpawner = GetComponent<AvatarSpawner>();
         twitch = GameObject.FindWithTag("GameController").GetComponent<TwitchConnect>();
-        twitch.OnChatMessage.AddListener(OnChatMessage);
+        //twitch.OnChatMessage.AddListener(OnChatMessage);
     }
 
     public void OnChatMessage(string user, string message)
@@ -21,7 +21,7 @@ public class ChangeAvatarByName : MonoBehaviour
         //Detectar comando del array
         string command = null;
 
-        foreach(string com in commands)
+        foreach (string com in commands)
         {
             //Debug.Log($"{message.ToLower()} comparing with {com.ToLower()}");
             if (message.ToLower().Contains(com.ToLower()))
@@ -32,11 +32,13 @@ public class ChangeAvatarByName : MonoBehaviour
         }
 
         if (command == null)
+        {
+            Debug.Log("El comando fue nulo");
             return;
+        }
 
         message = message.Substring(message.IndexOf(command) + command.Length).Trim();
-
-        Debug.Log(message);
+        //Debug.LogWarning("Sigue funcando este pdo");
 
         //Si el comando no tiene parametros, muestra una lista de los avatares disponibles
         if(message == "")
@@ -57,28 +59,24 @@ public class ChangeAvatarByName : MonoBehaviour
             twitch.SendTwitchMessage(msg);
         }
 
-        try
+        Debug.LogWarning($"Buscando el avatar {message}");
+
+        bool avatarFound = false;
+
+        //Cambia el modelo del avatar
+        foreach (AvatarCharacter avatar in avatarSpawner.avatarCharacters)
         {
-            bool avatarFound = false;
-
-            //Cambia el modelo del avatar
-            foreach (AvatarCharacter avatar in avatarSpawner.avatarCharacters)
+            if (message.ToLower().Contains(avatar.name.ToLower()))
             {
-                if (message.ToLower().Contains(avatar.name.ToLower()))
-                {
-                    DatabaseManager.Instance.UpdateAvatar(name, avatar.name);
-                    avatarFound = true;
-                }
-            }
-
-            if (!avatarFound)
-            {
-                twitch.SendTwitchMessage("No se encontró un avatar con ese nombre");
+                DatabaseManager.Instance.UpdateAvatar(user, avatar.name);
+                avatarFound = true;
+                break;
             }
         }
-        catch (System.Exception ex)
+
+        if (!avatarFound && message != "")
         {
-            twitch.SendTwitchMessage("Hey! Relaja la raja, primero debes tener un avatar activo");
+            twitch.SendTwitchMessage("No se encontró un avatar con ese nombre");
         }
     }
 }
