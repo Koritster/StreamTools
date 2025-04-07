@@ -136,6 +136,28 @@ public class DatabaseManager : MonoBehaviour
         return koritos;
     }
 
+    public bool CheckKoritos(string user, int requiredKoritos)
+    {
+        int currentKoritos = OnGetKoritosSync(user); // Utiliza la versión síncrona de obtener Koritos
+        return currentKoritos >= requiredKoritos;
+    }
+
+    // Función síncrona para obtener los Koritos (llama a la función OnGetKoritos pero de manera bloqueante)
+    public int OnGetKoritosSync(string user)
+    {
+        // Suponiendo que OnGetKoritos es asíncrona, deberías implementarlo de manera síncrona.
+        // Aquí hay un ejemplo simple de cómo hacerlo:
+        int koritos = 0;
+
+        // Si ya tienes un sistema para obtener los koritos de manera síncrona, puedes usarlo aquí.
+        Task.Run(async () =>
+        {
+            koritos = await OnGetKoritos(user); // Obtener de la base de datos
+        }).Wait(); // Espera a que termine la tarea sincrónicamente
+
+        return koritos;
+    }
+
     public async Task<bool> SubtractKoritos(string name, int value)
     {
         DatabaseReference userRef = dbRef.Child("users").Child(name);
