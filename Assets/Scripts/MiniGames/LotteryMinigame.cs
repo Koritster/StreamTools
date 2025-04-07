@@ -5,16 +5,33 @@ using System.Linq; // Permite usar consultas LINQ para manipular colecciones de 
 
 public class LotteryMinigame : MinigameClass
 {
+    public Transform cardContainer; // Asignar en el Inspector
+    private Dictionary<string, GameObject> cardPrefabs = new Dictionary<string, GameObject>(); // Para mantener referencia a los prefabs
     private List<string> allElements = new List<string> { "Sol", "Luna", "Estrella", "Sirena", "Catrin", "Diablo", "Barril", "Arbol", "Gallo", "Rana" }; // Lista de elementos disponibles
     private Dictionary<string, HashSet<string>> playerCards = new Dictionary<string, HashSet<string>>(); // Tarjetas de los jugadores
     private HashSet<string> calledElements = new HashSet<string>(); // Elementos anunciados
     private bool gameStarted = false;
+    private int elementsSpawned = 0; // Para saber cuántos van
 
     private void Start()
     {
         twitch = TwitchConnect.Instance;
         twitch.OnChatMessage.AddListener(OnChatMessage);
         twitch.OnChatMessage.AddListener(StartGameCommand);
+
+        // Cargar todos los prefabs automáticamente desde Resources/Cards
+        foreach (var element in allElements)
+        {
+            GameObject prefab = Resources.Load<GameObject>("Lottery/" + element);
+            if (prefab != null)
+            {
+                cardPrefabs[element] = prefab;
+            }
+            else
+            {
+                Debug.LogWarning("No se encontró prefab para: " + element);
+            }
+        }
     }
 
     // Comienza el juego y da una tarjeta única a cada jugador
@@ -70,6 +87,7 @@ public class LotteryMinigame : MinigameClass
                 if (playerCards[user].Count == 0) // Si ya no quedan elementos, gana el jugador
                 {
                     twitch.SendTwitchMessage(user + " ha ganado la lotería!");
+                    ClearCardsFromScreen();
                     gameStarted = false;
                     playerCards.Clear(); // Reinicia el juego
                     calledElements.Clear();
@@ -92,7 +110,8 @@ public class LotteryMinigame : MinigameClass
                 gameStarted = false;
                 playerCards.Clear();
                 calledElements.Clear();
-                yield break; // Sale de la corrutina
+                ClearCardsFromScreen();
+                yield break;
             }
 
             string newElement;
@@ -103,7 +122,36 @@ public class LotteryMinigame : MinigameClass
 
             calledElements.Add(newElement);
             twitch.SendTwitchMessage("Nuevo elemento: " + newElement);
+
+            // Mostrar sprite en pantalla
+            GameObject prefab = Resources.Load<GameObject>("Lottery/" + newElement);
+            if (prefab != null && cardContainer != null)
+            {
+                GameObject instance = Instantiate(prefab, cardContainer);
+                int maxPerRow = 5;
+                float xSpacing = 2f;
+                float ySpacing = -3f;
+                int column = elementsSpawned % maxPerRow;
+                int row = elementsSpawned / maxPerRow;
+                // Posición horizontal ordenada
+                instance.transform.localPosition = new Vector3(column * xSpacing, row * ySpacing, 0);
+                Animator anim = instance.GetComponent<Animator>();
+                if (anim != null)
+                {
+                    anim.Play("Carts");
+                }
+                elementsSpawned++; // Aumenta contador para que el siguiente se acomode a la derecha
+            }
         }
+    }
+
+    private void ClearCardsFromScreen()
+    {
+        foreach (Transform child in cardContainer)
+        {
+            Destroy(child.gameObject);
+        }
+        elementsSpawned = 0; // Reiniciar el contador
     }
 }
 
