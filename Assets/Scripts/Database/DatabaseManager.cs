@@ -112,6 +112,20 @@ public class DatabaseManager : MonoBehaviour
         await ModifyKoritosTask(name, value);
     }
 
+    public async void UseKoritos(string name, int value) 
+    {
+        bool success = await SubtractKoritos(name, value);
+
+        if (success)
+        {
+            Debug.Log("Operación exitosa: Koritos restados.");
+        }
+        else
+        {
+            Debug.LogWarning("Operación fallida: No hay suficientes Koritos.");
+        }
+    }
+
     public int GetKoritos(string name)
     {
         int koritos = 0;
@@ -120,6 +134,43 @@ public class DatabaseManager : MonoBehaviour
             koritos = await OnGetKoritos(name);
         });    
         return koritos;
+    }
+
+    public async Task<bool> SubtractKoritos(string name, int value)
+    {
+        DatabaseReference userRef = dbRef.Child("users").Child(name);
+        DataSnapshot snapshot = await userRef.Child("koritos").GetValueAsync();
+
+        // Si el usuario no tiene "koritos", devolvemos false
+        if (!snapshot.Exists)
+        {
+            Debug.LogWarning("El usuario no existe o no tiene Koritos.");
+            return false;
+        }
+
+        // Obtenemos los Koritos actuales
+        int currentKoritos = int.Parse(snapshot.Value.ToString());
+
+        // Verificamos si el usuario tiene suficientes Koritos
+        if (currentKoritos >= value)
+        {
+            // Restamos los Koritos
+            int newKoritos = currentKoritos - value;
+
+            // Actualizamos el valor en la base de datos
+            await userRef.UpdateChildrenAsync(new System.Collections.Generic.Dictionary<string, object> {
+            { "koritos", newKoritos }
+        });
+
+            Debug.Log("Koritos restados correctamente");
+            return true; // La operación fue exitosa
+        }
+        else
+        {
+            // Si no tiene suficientes Koritos, retornamos false
+            Debug.LogWarning("No tiene suficientes Koritos.");
+            return false;
+        }
     }
 
     private async Task ModifyKoritosTask(string name, int value)
@@ -154,6 +205,8 @@ public class DatabaseManager : MonoBehaviour
     }
 
     #endregion
+
+    #region Avatar
 
     public async void SpawnAvatar(string name)
     {
@@ -209,6 +262,14 @@ public class DatabaseManager : MonoBehaviour
 
         return default;
     }
+
+    #endregion
+
+    #region Events
+
+
+
+    #endregion
 
     #region Triggers
 
