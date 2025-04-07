@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using UnityEditor;
 using Unity.VisualScripting;
 using static UnityEngine.UIElements.UxmlAttributeDescription;
+using static UnityEngine.Rendering.DebugUI;
 
 public class DatabaseManager : MonoBehaviour
 {
@@ -16,9 +17,13 @@ public class DatabaseManager : MonoBehaviour
 
     private DatabaseReference koritosDispRef;
 
+    private AvatarSpawner avatarSpawner;
+
     private void Awake()
     {
         dbRef = FirebaseDatabase.DefaultInstance.RootReference;
+
+        avatarSpawner = FindAnyObjectByType<AvatarSpawner>();
         
         if (Instance == null)
         {
@@ -30,7 +35,12 @@ public class DatabaseManager : MonoBehaviour
         koritosDispRef = FirebaseDatabase.DefaultInstance.GetReference("users");
         koritosDispRef.ChildChanged -= OnKoritosChanged;
         koritosDispRef.ChildChanged += OnKoritosChanged;
+
+        koritosDispRef.ChildChanged -= OnAvatarChanged;
+        koritosDispRef.ChildChanged += OnAvatarChanged;
     }
+
+    #region User
 
     public async void CreateUser(string name)
     {
@@ -44,7 +54,7 @@ public class DatabaseManager : MonoBehaviour
         }
 
         //Crear usuario
-        User newUser = new User(name, 0);
+        User newUser = new User(name, 0, default);
         string json = JsonUtility.ToJson(newUser);
 
         await dbRef.Child("users").Child(name).SetRawJsonValueAsync(json);
@@ -66,6 +76,36 @@ public class DatabaseManager : MonoBehaviour
             }
         });
     }
+
+    private async Task OnGetUserData(string name)
+    {
+        DataSnapshot snapshot = await (UserSnapshot(name));
+
+        if (snapshot.Exists)
+        {
+            foreach (var dato in snapshot.Children)
+            {
+                Debug.Log("Clave: " + dato.Key + ", Valor: " + dato.Value);
+            }
+        }
+        else
+        {
+            Debug.Log("El usuario no existe");
+        }
+    }
+
+    private async Task<DataSnapshot> UserSnapshot(string name)
+    {
+        DatabaseReference userRef = dbRef.Child("users").Child(name);
+
+        DataSnapshot snapshot = await userRef.GetValueAsync();
+
+        return snapshot;
+    }
+
+    #endregion
+
+    #region Koritos
 
     public async void UpdateKoritos(string name, int value)
     {
@@ -113,32 +153,63 @@ public class DatabaseManager : MonoBehaviour
         return 0;
     }
 
-    private async Task OnGetUserData(string name)
+    #endregion
+
+    public async void SpawnAvatar(string name)
+    {
+        string avatar = await OnGetAvatar(name);
+        Debug.Log($"El avatar de la base de datos es {avatar}");
+        //Si el avatar es default, cambiarlo a uno aleatorio
+        if (avatar == default)
+        {
+            AvatarCharacter tempAvatar = avatarSpawner.avatarCharacters[UnityEngine.Random.Range(0, avatarSpawner.avatarCharacters.Length)];
+            Debug.Log($"El avatar seleccionado aleatoriamente es {tempAvatar.name}");
+            DatabaseManager.Instance.UpdateAvatar(name, tempAvatar.name);
+        }
+        else
+        {
+            Debug.Log("El jugador ya cuenta con un avatar");
+            foreach (AvatarCharacter tempAvatar in avatarSpawner.avatarCharacters)
+            {
+                if (tempAvatar.name == avatar)
+                {
+                    avatarSpawner.usersWithAvatar[name].ChangeAvatar(tempAvatar);
+                    break;
+                }
+            }
+        }
+    }
+
+    public async void UpdateAvatar(string name, string avatar)
+    {
+        await ModifyAvatarTask(name, avatar);
+    }
+
+    private async Task ModifyAvatarTask(string name, string avatar)
+    {
+        DatabaseReference userRef = dbRef.Child("users").Child(name);
+
+        await userRef.UpdateChildrenAsync(new System.Collections.Generic.Dictionary<string, object>{
+            { "avatar", avatar }
+        });
+
+        Debug.Log("Avatar cambiado exitosamente");
+    }
+
+    //Buscar avatar en la bd, retornar default si no tiene el usuario
+    private async Task<string> OnGetAvatar(string name)
     {
         DataSnapshot snapshot = await (UserSnapshot(name));
 
         if (snapshot.Exists)
         {
-            foreach (var dato in snapshot.Children)
-            {
-                Debug.Log("Clave: " + dato.Key + ", Valor: " + dato.Value);
-            }
+            return snapshot.Child("avatar").Value.ToString();
         }
-        else
-        {
-            Debug.Log("El usuario no existe");
-        }
+
+        return default;
     }
 
-    private async Task<DataSnapshot> UserSnapshot(string name)
-    {
-        DatabaseReference userRef = dbRef.Child("users").Child(name);
-
-        DataSnapshot snapshot = await userRef.GetValueAsync();
-
-        return snapshot;
-    }
-
+    #region Triggers
 
     private void OnKoritosChanged(object sender, ChildChangedEventArgs e)
     {
@@ -150,4 +221,28 @@ public class DatabaseManager : MonoBehaviour
             TwitchConnect.Instance.SendTwitchMessage($"@{user} ahora tiene {newKoritos} Koritos!");
         }
     }
+
+    private void OnAvatarChanged(object sender, ChildChangedEventArgs e)
+    {
+        if (e.Snapshot.Exists)
+        {
+            string user = e.Snapshot.Key; // Nombre del usuario que cambió
+            string newAvatar = e.Snapshot.Child("avatar").Value.ToString();
+
+            if (avatarSpawner.usersWithAvatar.ContainsKey(user))
+            {
+                //AvatarCharacter tempAvatar = avatarSpawner.avatarCharacters[UnityEngine.Random.Range(0, avatarSpawner.avatarCharacters.Length)];
+                foreach (AvatarCharacter tempAvatar in avatarSpawner.avatarCharacters)
+                {
+                    if (tempAvatar.name == newAvatar)
+                    {
+                        avatarSpawner.usersWithAvatar[user].ChangeAvatar(tempAvatar);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    #endregion
 }

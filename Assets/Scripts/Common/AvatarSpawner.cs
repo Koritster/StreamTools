@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Timers;
 using UnityEngine;
 
 public class CrearUsuario : MonoBehaviour
@@ -78,8 +78,8 @@ public class AvatarSpawner : MonoBehaviour
 
             AvatarStateMachine avatar = avatarGO.GetComponent<AvatarStateMachine>();
             avatar.ChangeName(user);
-            AvatarCharacter tempAvatar = avatarCharacters[Random.Range(0, avatarCharacters.Length)];
-            avatar.ChangeAvatar(tempAvatar);
+
+            DatabaseManager.Instance.SpawnAvatar(user);
 
             DatabaseManager.Instance.CreateUser(user);
 

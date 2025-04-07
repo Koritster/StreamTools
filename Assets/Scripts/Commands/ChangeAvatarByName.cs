@@ -59,13 +59,21 @@ public class ChangeAvatarByName : MonoBehaviour
 
         try
         {
+            bool avatarFound = false;
+
             //Cambia el modelo del avatar
             foreach (AvatarCharacter avatar in avatarSpawner.avatarCharacters)
             {
                 if (message.ToLower().Contains(avatar.name.ToLower()))
                 {
-                    avatarSpawner.usersWithAvatar[user].ChangeAvatar(avatar);
+                    DatabaseManager.Instance.UpdateAvatar(name, avatar.name);
+                    avatarFound = true;
                 }
+            }
+
+            if (!avatarFound)
+            {
+                twitch.SendTwitchMessage("No se encontró un avatar con ese nombre");
             }
         }
         catch (System.Exception ex)
