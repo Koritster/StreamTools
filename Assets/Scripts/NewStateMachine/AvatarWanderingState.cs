@@ -68,6 +68,10 @@ public class AvatarWanderingState : AvatarBaseState
             Ctx.TimerHasEnded = false;
             SwitchState(Factory.Idle());
         }
+        else if (Ctx.WasClicked)
+        {
+            SwitchState(Factory.Thrown());
+        }
     }
 
     IEnumerator StateTimer()

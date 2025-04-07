@@ -28,6 +28,7 @@ public class AvatarIdleState : AvatarBaseState
 
     public override void ExitState()
     {
+        Ctx.TimerHasEnded = false;
         Ctx.StopCoroutine(Ctx.ActualCoroutine);
         Debug.Log("SALIENDO DE IDLE...");
     }
@@ -48,8 +49,10 @@ public class AvatarIdleState : AvatarBaseState
     {
        if(Ctx.TimerHasEnded)
         {
-            Ctx.TimerHasEnded = false;
             SwitchState(Factory.Wandering());
+        }else if (Ctx.WasClicked)
+        {
+            SwitchState(Factory.Thrown());
         }
     }
 
