@@ -9,6 +9,18 @@ public class GalleraMinigame : MinigameClass
     private Dictionary<string, int> apuestasB = new Dictionary<string, int>(); 
 
     private int vidaA = 100, vidaB = 100;
+    public Transform galloContainer;
+    public GameObject galloPrefabA;
+    public GameObject galloPrefabB;
+    private GameObject instanciaGalloA;
+    private GameObject instanciaGalloB;
+    private HealthBar barraVidaA;
+    private HealthBar barraVidaB;
+
+    private SpriteRenderer spriteA;
+    private SpriteRenderer spriteB;
+    private Animator animA;
+    private Animator animB;
     private bool gameStarted = false;
 
     private void Start()
@@ -62,16 +74,76 @@ public class GalleraMinigame : MinigameClass
     //Inicia la pelea por turnos hasta que un gallo pierda toda su vida.
     private System.Collections.IEnumerator Fight()
     {
+        // Instanciar gallos
+        if (galloPrefabA != null && galloPrefabB != null && galloContainer != null)
+        {
+            instanciaGalloA = Instantiate(galloPrefabA, galloContainer);
+            instanciaGalloA.transform.localPosition = new Vector3(-2f, 0, 0); // Posición izquierda
+
+            instanciaGalloB = Instantiate(galloPrefabB, galloContainer);
+            instanciaGalloB.transform.localPosition = new Vector3(2f, 0, 0); // Posición derecha
+
+            spriteA = instanciaGalloA.GetComponent<SpriteRenderer>();
+            spriteB = instanciaGalloB.GetComponent<SpriteRenderer>();
+
+            animA = instanciaGalloA.GetComponent<Animator>();
+            animB = instanciaGalloB.GetComponent<Animator>();
+
+            // Obtener componentes de barra de vida (debe estar en prefab)
+            barraVidaA = instanciaGalloA.GetComponentInChildren<HealthBar>();
+            barraVidaB = instanciaGalloB.GetComponentInChildren<HealthBar>();
+
+            if (barraVidaA != null) barraVidaA.SetHealth(vidaA, 100);
+            if (barraVidaB != null) barraVidaB.SetHealth(vidaB, 100);
+        }
+
         while (vidaA > 0 && vidaB > 0)
         {
-            yield return new WaitForSeconds(2);
+            yield return new WaitForSeconds(5);
             int damageA = Attack();
             int damageB = Attack();
             vidaB -= damageA;
             vidaA -= damageB;
+            if (barraVidaA != null) barraVidaA.SetHealth(Mathf.Max(vidaA, 0), 100);
+            if (barraVidaB != null) barraVidaB.SetHealth(Mathf.Max(vidaB, 0), 100);
+            StartCoroutine(EfectoGolpe(spriteA, instanciaGalloA.transform, animA));
+            StartCoroutine(EfectoGolpe(spriteB, instanciaGalloB.transform, animB));
             twitch.SendTwitchMessage("Gallo A golpea con " + damageA + " de daño. Gallo B golpea con " + damageB + " de daño.");
         }
         DeclareWinner();
+    }
+
+    private IEnumerator EfectoGolpe(SpriteRenderer sprite, Transform transform, Animator animator)
+    {
+        Vector3 originalPos = transform.localPosition;
+
+        // Cambiar a color rojo
+        if (sprite != null) sprite.color = Color.red;
+
+        // Reproducir animación si existe
+        if (animator != null) animator.Play("Attack");
+
+        // Sacudida
+        float shakeTime = 0.3f;
+        float elapsed = 0f;
+        float shakeAmount = 0.1f;
+
+        while (elapsed < shakeTime)
+        {
+            float offsetX = Random.Range(-shakeAmount, shakeAmount);
+            float offsetY = Random.Range(-shakeAmount, shakeAmount);
+            if (transform != null)
+                transform.localPosition = originalPos + new Vector3(offsetX, offsetY, 0);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        // Restaurar color y posición
+        if (transform != null)
+            transform.localPosition = originalPos;
+
+        if (sprite != null)
+            sprite.color = Color.white;
     }
 
     //Determina el daño de un ataque con posibilidades de fallar, ser normal o crítico.
@@ -94,5 +166,7 @@ public class GalleraMinigame : MinigameClass
         {
             DatabaseManager.Instance.UpdateKoritos(player.Key, player.Value * 2);
         }
+        Destroy(instanciaGalloA);
+        Destroy(instanciaGalloB);
     }
 }
