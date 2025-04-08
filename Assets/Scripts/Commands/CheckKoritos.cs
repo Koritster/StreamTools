@@ -1,17 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using UnityEngine;
 
-public class EventsController : MonoBehaviour
+public class CheckKoritos : MonoBehaviour
 {
     [SerializeField] private string[] commands;
 
+    private AvatarSpawner avatarSpawner;
     private TwitchConnect twitch;
 
     private void Start()
     {
+        avatarSpawner = GetComponent<AvatarSpawner>();
         twitch = GameObject.FindWithTag("GameController").GetComponent<TwitchConnect>();
         twitch.OnChatMessage.AddListener(OnChatMessage);
     }
@@ -33,12 +33,11 @@ public class EventsController : MonoBehaviour
 
         if (command == null)
         {
-            print("El comando fue nulo");
+            Debug.Log("El comando fue nulo");
             return;
         }
 
-        message = message.Substring(message.IndexOf(command) + command.Length).Trim();
-
-        DatabaseManager.Instance.CallPythonEvent(user, message);
+        //Mostrar los koritos del jugador
+        DatabaseManager.Instance.PrintKoritos(user);
     }
 }

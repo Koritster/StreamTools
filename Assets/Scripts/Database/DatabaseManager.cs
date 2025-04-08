@@ -8,6 +8,8 @@ using UnityEditor;
 using Unity.VisualScripting;
 using static UnityEngine.UIElements.UxmlAttributeDescription;
 using static UnityEngine.Rendering.DebugUI;
+using System.Diagnostics;
+using System.IO;
 
 public class DatabaseManager : MonoBehaviour
 {
@@ -38,6 +40,12 @@ public class DatabaseManager : MonoBehaviour
 
         koritosDispRef.ChildChanged -= OnAvatarChanged;
         koritosDispRef.ChildChanged += OnAvatarChanged;
+
+        string relativePath = "Assets/Scripts/Events/Events.py";
+        string absolutePath = Path.GetFullPath(relativePath);
+        pythonScriptPath = absolutePath;
+
+        twitch = GameObject.FindWithTag("GameController").GetComponent<TwitchConnect>();
     }
 
     #region User
@@ -49,7 +57,7 @@ public class DatabaseManager : MonoBehaviour
         //Si ya existe, no se crea
         if (snapshot.Exists)
         {
-            Debug.LogWarning("Ya existe este usuario");
+            UnityEngine.Debug.LogWarning("Ya existe este usuario");
             return;
         }
 
@@ -68,11 +76,11 @@ public class DatabaseManager : MonoBehaviour
         {
             if (task.IsCompleted)
             {
-                Debug.Log($"Usuario {name} eliminado correctamente.");
+                UnityEngine.Debug.Log($"Usuario {name} eliminado correctamente.");
             }
             else
             {
-                Debug.LogError($"Error al eliminar el usuario: {task.Exception}");
+                UnityEngine.Debug.LogError($"Error al eliminar el usuario: {task.Exception}");
             }
         });
     }
@@ -85,12 +93,12 @@ public class DatabaseManager : MonoBehaviour
         {
             foreach (var dato in snapshot.Children)
             {
-                Debug.Log("Clave: " + dato.Key + ", Valor: " + dato.Value);
+                UnityEngine.Debug.Log("Clave: " + dato.Key + ", Valor: " + dato.Value);
             }
         }
         else
         {
-            Debug.Log("El usuario no existe");
+            UnityEngine.Debug.Log("El usuario no existe");
         }
     }
 
@@ -112,18 +120,11 @@ public class DatabaseManager : MonoBehaviour
         await ModifyKoritosTask(name, value);
     }
 
-    public async void UseKoritos(string name, int value) 
+    public async void PrintKoritos(string name)
     {
-        bool success = await SubtractKoritos(name, value);
+        int koritos = await OnGetKoritos(name);
 
-        if (success)
-        {
-            Debug.Log("Operación exitosa: Koritos restados.");
-        }
-        else
-        {
-            Debug.LogWarning("Operación fallida: No hay suficientes Koritos.");
-        }
+        twitch.SendTwitchMessage($"{name} tienes {koritos} koritos!");
     }
 
     public int GetKoritos(string name)
@@ -136,28 +137,6 @@ public class DatabaseManager : MonoBehaviour
         return koritos;
     }
 
-    public bool CheckKoritos(string user, int requiredKoritos)
-    {
-        int currentKoritos = OnGetKoritosSync(user); // Utiliza la versión síncrona de obtener Koritos
-        return currentKoritos >= requiredKoritos;
-    }
-
-    // Función síncrona para obtener los Koritos (llama a la función OnGetKoritos pero de manera bloqueante)
-    public int OnGetKoritosSync(string user)
-    {
-        // Suponiendo que OnGetKoritos es asíncrona, deberías implementarlo de manera síncrona.
-        // Aquí hay un ejemplo simple de cómo hacerlo:
-        int koritos = 0;
-
-        // Si ya tienes un sistema para obtener los koritos de manera síncrona, puedes usarlo aquí.
-        Task.Run(async () =>
-        {
-            koritos = await OnGetKoritos(user); // Obtener de la base de datos
-        }).Wait(); // Espera a que termine la tarea sincrónicamente
-
-        return koritos;
-    }
-
     public async Task<bool> SubtractKoritos(string name, int value)
     {
         DatabaseReference userRef = dbRef.Child("users").Child(name);
@@ -166,7 +145,7 @@ public class DatabaseManager : MonoBehaviour
         // Si el usuario no tiene "koritos", devolvemos false
         if (!snapshot.Exists)
         {
-            Debug.LogWarning("El usuario no existe o no tiene Koritos.");
+            UnityEngine.Debug.LogWarning("El usuario no existe o no tiene Koritos.");
             return false;
         }
 
@@ -184,13 +163,13 @@ public class DatabaseManager : MonoBehaviour
             { "koritos", newKoritos }
         });
 
-            Debug.Log("Koritos restados correctamente");
+            UnityEngine.Debug.Log("Koritos restados correctamente");
             return true; // La operación fue exitosa
         }
         else
         {
             // Si no tiene suficientes Koritos, retornamos false
-            Debug.LogWarning("No tiene suficientes Koritos.");
+            UnityEngine.Debug.LogWarning("No tiene suficientes Koritos.");
             return false;
         }
     }
@@ -208,7 +187,7 @@ public class DatabaseManager : MonoBehaviour
             { "koritos", newKoritos }
         });
 
-        Debug.Log("Koritos added correctamente");
+        UnityEngine.Debug.Log("Koritos added correctamente");
     }
 
     private async Task<int> OnGetKoritos(string name)
@@ -234,17 +213,17 @@ public class DatabaseManager : MonoBehaviour
     {
         string avatar = await OnGetAvatar(name);
 
-        Debug.Log($"El avatar de la base de datos es {avatar}");
+        UnityEngine.Debug.Log($"El avatar de la base de datos es {avatar}");
         //Si el avatar es default, cambiarlo a uno aleatorio
         if (avatar == default)
         {
             AvatarCharacter tempAvatar = avatarSpawner.avatarCharacters[UnityEngine.Random.Range(0, avatarSpawner.avatarCharacters.Length)];
-            Debug.Log($"El avatar seleccionado aleatoriamente es {tempAvatar.name}");
+            UnityEngine.Debug.Log($"El avatar seleccionado aleatoriamente es {tempAvatar.name}");
             DatabaseManager.Instance.UpdateAvatar(name, tempAvatar.name);
         }
         else
         {
-            Debug.Log("El jugador ya cuenta con un avatar");
+            UnityEngine.Debug.Log("El jugador ya cuenta con un avatar");
             foreach (AvatarCharacter tempAvatar in avatarSpawner.avatarCharacters)
             {
                 if (tempAvatar.name == avatar)
@@ -269,7 +248,7 @@ public class DatabaseManager : MonoBehaviour
             { "avatar", avatar }
         });
 
-        Debug.LogWarning("Avatar cambiado exitosamente");
+        UnityEngine.Debug.LogWarning("Avatar cambiado exitosamente");
     }
 
     //Buscar avatar en la bd, retornar default si no tiene el usuario
@@ -289,7 +268,85 @@ public class DatabaseManager : MonoBehaviour
 
     #region Events
 
+    public string pythonScriptPath;
 
+    private TwitchConnect twitch;
+
+    public async void CallPythonEvent(string user, string message)
+    {
+        switch (message)
+        {
+            case "apagar":
+                if (await SubtractKoritos(user, 5000))
+                {
+                    ShutdownComputer();
+                    twitch.SendTwitchMessage($"El usuario {user} ha canjeado Apagar!");
+                }
+                else
+                {
+                    twitch.SendTwitchMessage($"No cuentas con los koritos suficientes para Apagar!");
+                }
+                break;
+            case "rickroll":
+                if (await SubtractKoritos(user, 250))
+                {
+                    RickRoll();
+                    twitch.SendTwitchMessage($"El usuario {user} ha canjeado RickRoll!");
+                }
+                else
+                {
+                    twitch.SendTwitchMessage($"No cuentas con los koritos suficientes para RickRoll!");
+                }
+                break;
+            default:
+                twitch.SendTwitchMessage($"Eventos disponibles: apagar - 5000 koritos, rickroll - 250 koritos");
+                break;
+        }
+    }
+
+    public void ShutdownComputer()
+    {
+        RunPythonScript("shutdown");
+    }
+
+    public void SearchPO()
+    {
+        RunPythonScript("searchPO");
+    }
+
+    public void RickRoll()
+    {
+        RunPythonScript("rickroll");
+    }
+
+    private void RunPythonScript(string action, string argument = "")
+    {
+        ProcessStartInfo psi = new ProcessStartInfo
+        {
+            FileName = "python", // o "python3" si aplica
+            Arguments = $"\"{pythonScriptPath}\" {action} {argument}",
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true
+        };
+
+        try
+        {
+            using (Process process = Process.Start(psi))
+            {
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                UnityEngine.Debug.Log($"Python output: {output}");
+                if (!string.IsNullOrEmpty(error))
+                    UnityEngine.Debug.LogError($"Python error: {error}");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            UnityEngine.Debug.LogError("Error ejecutando el script de Python: " + ex.Message);
+        }
+    }
 
     #endregion
 
