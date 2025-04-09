@@ -298,8 +298,19 @@ public class DatabaseManager : MonoBehaviour
                     twitch.SendTwitchMessage($"No cuentas con los koritos suficientes para RickRoll!");
                 }
                 break;
+            case "chamba":
+                if (await SubtractKoritos(user, 100))
+                {
+                    Chamba();
+                    twitch.SendTwitchMessage($"El usuario {user} ha canjeado Chamba!");
+                }
+                else
+                {
+                    twitch.SendTwitchMessage($"No cuentas con los koritos suficientes para Chamba!");
+                }
+                break;
             default:
-                twitch.SendTwitchMessage($"Eventos disponibles: apagar - 5000 koritos, rickroll - 250 koritos");
+                twitch.SendTwitchMessage($"Eventos disponibles: apagar - 5000 koritos, rickroll - 250 koritos, chamba - 100 koritos");
                 break;
         }
     }
@@ -317,6 +328,11 @@ public class DatabaseManager : MonoBehaviour
     public void RickRoll()
     {
         RunPythonScript("rickroll");
+    }
+
+    public void Chamba()
+    {
+        RunPythonScript("chamba");
     }
 
     private void RunPythonScript(string action, string argument = "")
